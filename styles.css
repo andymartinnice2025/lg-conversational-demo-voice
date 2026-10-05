@@ -422,10 +422,17 @@ a { color: inherit; }
   width: 42px !important;
   height: 42px !important;
   min-width: 0 !important;
+  max-width: 42px !important;
+  min-height: 0 !important;
+  max-height: 42px !important;
   border-radius: 50% !important;
+  /* The source SVG is landscape (354x251 — icon + "L&G" wordmark side by
+     side), so a single background-size value is used: that sets width and
+     leaves height as auto, preserving its real aspect ratio instead of
+     squashing it into a square (which was rendering as an egg shape). */
   background: #fff
     url("https://www.legalandgeneral.com/asset/492094/globalassets/global-shared-assets/logos/landg_logo.svg")
-    center / 26px 26px no-repeat !important;
+    center / 28px no-repeat !important;
   border: 1.5px solid var(--lg-border) !important;
   box-shadow: 0 2px 8px rgba(0, 29, 110, .12) !important;
 }

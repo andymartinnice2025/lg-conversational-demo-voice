@@ -265,13 +265,31 @@
   // CSS) so the conversation looks the same as the chat version's message
   // bubbles regardless of channel.
 
-  function renderTranscriptBubble(originator, text) {
+  // The widget's README doesn't enumerate the exact originator values for
+  // transcription events (only newInfo's, where 'remote' = the bot worked
+  // correctly for ui instructions). The first live call showed every
+  // transcript bubble landing on the same side, so this matches several
+  // plausible spellings defensively rather than a single hardcoded string.
+  // If the value doesn't match anything recognisable, it alternates from
+  // the last known side — a reasonable fallback for ordinary back-and-forth
+  // turns — rather than guessing one fixed default. See the console
+  // logging in app-voice.js for pinning down the real value from a live call.
+  var lastTranscriptSide = "bot"; // the call usually opens with a bot greeting
+
+  function classifyTranscriptSide(originator) {
+    var value = String(originator || "");
+    if (/remote|bot|agent|assistant|ai/i.test(value)) return "bot";
+    if (/local|user|customer|caller|human/i.test(value)) return "user";
+    return lastTranscriptSide === "bot" ? "user" : "bot";
+  }
+
+  function renderTranscriptBubble(side, text) {
     if (!els.transcript || !text) return;
     var empty = document.getElementById("voice-transcript-empty");
     if (empty) empty.remove();
 
     var row = document.createElement("div");
-    row.className = "transcript-row " + (originator === "remote" ? "bot" : "user");
+    row.className = "transcript-row " + side;
     var bubble = document.createElement("div");
     bubble.className = "transcript-bubble";
     bubble.textContent = text;
@@ -282,8 +300,10 @@
 
   function handleTranscript(originator, text) {
     if (!text) return;
-    renderTranscriptBubble(originator, text);
-    if (originator !== "remote") tryAutofillFromSpeech(text); // only the customer's own speech fills the form
+    var side = classifyTranscriptSide(originator);
+    lastTranscriptSide = side;
+    renderTranscriptBubble(side, text);
+    if (side === "user") tryAutofillFromSpeech(text); // only the customer's own speech fills the form
   }
 
   function submitBookingForm() {

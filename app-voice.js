@@ -86,8 +86,18 @@ async function startVoiceWidget() {
       // the customer can always type or correct any field directly.
       session.on("transcription", (transcription) => {
         if (!window.__lgWorkspace || !transcription) return;
+        // Logged deliberately: the README doesn't enumerate the exact
+        // originator values, and the first real call showed every bubble
+        // rendering as the same side, so this needs to be confirmed against
+        // a real payload rather than guessed again. Check this in DevTools
+        // during the next test call.
+        console.log("[voice] transcription event:", transcription);
         (transcription.messages || []).forEach((message) => {
-          window.__lgWorkspace.handleTranscript(transcription.originator, message.text || "");
+          console.log("[voice] transcription message:", message);
+          window.__lgWorkspace.handleTranscript(
+            (message.originator || transcription.originator),
+            message.text || ""
+          );
         });
       });
     });
