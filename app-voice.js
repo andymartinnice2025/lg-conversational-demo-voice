@@ -21,8 +21,8 @@ function sendInfo(text, data) {
 window.__lgSendInfo = sendInfo;
 
 function setCallState(state) {
-  const stage = document.getElementById("voice-stage");
-  if (stage) stage.dataset.callState = state;
+  const dock = document.getElementById("voice-call-dock");
+  if (dock) dock.dataset.callState = state;
 }
 
 async function startVoiceWidget() {
@@ -32,11 +32,12 @@ async function startVoiceWidget() {
         label: "Ask L&G",
         tagline: "Speak with Ella, our virtual assistant",
         theme: "CLEAN_WHITE",
-        transcription: { enabled: true },
-        demoPage: {
-          position: "centered",
-          background: { mode: "color", color: "#ffffff" }
-        }
+        // Left enabled so session.on('transcription') keeps firing — the
+        // widget's OWN transcript UI is hidden via CSS instead (styles.css),
+        // since disabling this setting might silence the underlying events
+        // too, not just its display, and that event is what workspace.js's
+        // transcript bubbles and voice-autofill both run on.
+        transcription: { enabled: true }
       }
     });
 
@@ -91,24 +92,22 @@ async function startVoiceWidget() {
       });
     });
 
-    const loading = document.getElementById("voice-loading");
-    if (loading) loading.style.display = "none";
-
     // The widget appends its own root straight to document.body (confirmed
-    // by inspecting the bundle — there's no container/mount option), so we
-    // position it over our dedicated stage the same non-reparenting way the
-    // chat version positions Cognigy Webchat's root: find it, size/position
-    // it in place, and keep it synced on resize. Poll briefly for the node
-    // since it may not exist the instant the init promise resolves.
-    const stage = document.getElementById("voice-stage");
+    // by inspecting the bundle — there's no container/mount option). Rather
+    // than giving it the whole panel like the chat version does with
+    // Cognigy Webchat, we shrink it down via CSS (styles.css) to just the
+    // call button / mute / end-call controls and position that small
+    // cluster over a dedicated dock in the header. Poll briefly for the
+    // node since it may not exist the instant the init promise resolves.
+    const dock = document.getElementById("voice-call-dock");
     let attempts = 0;
     const findRoot = setInterval(() => {
       attempts += 1;
       const root = document.querySelector(".webrtc_widget_outer_wrapper");
-      if (root && stage) {
+      if (root && dock) {
         clearInterval(findRoot);
         const syncPosition = () => {
-          const rect = stage.getBoundingClientRect();
+          const rect = dock.getBoundingClientRect();
           root.style.top = `${rect.top + window.scrollY}px`;
           root.style.left = `${rect.left + window.scrollX}px`;
           root.style.width = `${rect.width}px`;
@@ -116,7 +115,7 @@ async function startVoiceWidget() {
         };
         syncPosition();
         window.addEventListener("resize", syncPosition);
-        new ResizeObserver(syncPosition).observe(stage);
+        new ResizeObserver(syncPosition).observe(dock);
       } else if (attempts > 50) {
         clearInterval(findRoot);
         console.warn("[voice] Could not find .webrtc_widget_outer_wrapper to position.");
@@ -124,11 +123,9 @@ async function startVoiceWidget() {
     }, 100);
   } catch (error) {
     console.error("Unable to initialise the voice widget", error);
-    const loading = document.getElementById("voice-loading");
-    if (loading) {
-      loading.innerHTML =
-        '<div><strong>We could not connect to the voice assistant.</strong>' +
-        '<span>Please refresh the page and try again.</span></div>';
+    const empty = document.getElementById("voice-transcript-empty");
+    if (empty) {
+      empty.textContent = "We could not connect to the voice assistant. Please refresh the page and try again.";
     }
   }
 }

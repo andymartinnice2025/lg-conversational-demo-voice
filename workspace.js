@@ -260,9 +260,30 @@
     }
   }
 
+  // ---- Transcript bubbles ---------------------------------------------------
+  // Rendered by us (not the widget's own transcript UI, which is hidden via
+  // CSS) so the conversation looks the same as the chat version's message
+  // bubbles regardless of channel.
+
+  function renderTranscriptBubble(originator, text) {
+    if (!els.transcript || !text) return;
+    var empty = document.getElementById("voice-transcript-empty");
+    if (empty) empty.remove();
+
+    var row = document.createElement("div");
+    row.className = "transcript-row " + (originator === "remote" ? "bot" : "user");
+    var bubble = document.createElement("div");
+    bubble.className = "transcript-bubble";
+    bubble.textContent = text;
+    row.appendChild(bubble);
+    els.transcript.appendChild(row);
+    els.transcript.scrollTop = els.transcript.scrollHeight;
+  }
+
   function handleTranscript(originator, text) {
-    if (!text || originator === "remote") return; // only the customer's own speech fills the form
-    tryAutofillFromSpeech(text);
+    if (!text) return;
+    renderTranscriptBubble(originator, text);
+    if (originator !== "remote") tryAutofillFromSpeech(text); // only the customer's own speech fills the form
   }
 
   function submitBookingForm() {
@@ -374,6 +395,7 @@
     els.layout = document.getElementById("workspace-layout");
     els.workspace = document.getElementById("context-workspace");
     els.body = document.getElementById("workspace-body");
+    els.transcript = document.getElementById("voice-transcript");
   });
 
   window.__lgWorkspace = {

@@ -301,23 +301,42 @@ a { color: inherit; }
 }
 .secure-note { font-size: 13px; color: var(--lg-muted); }
 
-#voice-stage {
+/* Anchor for the shrunk widget root (call button / mute / end-call) — see
+   the CSS block below and the positioning logic in app-voice.js. Reserves
+   enough width for the active-call control cluster so nothing jumps when
+   it appears. */
+.voice-call-dock {
   position: relative;
+  flex: 0 0 auto;
+  width: 170px;
+  height: 44px;
+}
+
+.voice-transcript {
   flex: 1 1 auto;
   min-height: 380px;
   background: #fff;
-  overflow: hidden;
+  overflow-y: auto;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
-#voice-loading {
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  gap: 14px; color: var(--lg-muted); z-index: 0;
+.voice-transcript__empty {
+  margin: auto; text-align: center; color: var(--lg-muted); font-size: 14px; max-width: 320px;
 }
-#voice-loading strong, #voice-loading span { display: block; }
-#voice-loading strong { color: var(--lg-navy); margin-bottom: 4px; }
-#voice-loading span { font-size: 13px; }
-.loading-mark {
-  width: 48px; height: 48px; border-radius: 50%; background: var(--lg-blue); color: white;
-  display: grid; place-items: center; font-size: 13px; font-weight: 700;
+
+/* Our own transcript bubbles, styled to match the chat version's message
+   bubbles so the conversation feels the same regardless of channel. */
+.transcript-row { display: flex; }
+.transcript-row.user { justify-content: flex-end; }
+.transcript-row.bot { justify-content: flex-start; }
+.transcript-bubble {
+  max-width: 80%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.5;
+}
+.transcript-row.user .transcript-bubble { background: var(--lg-navy); color: #fff; }
+.transcript-row.bot .transcript-bubble {
+  background: #f2f4f6; border: 1px solid var(--lg-border); color: var(--lg-navy);
 }
 
 .ai-note {
@@ -350,31 +369,84 @@ a { color: inherit; }
   --webrtc-avatar-bg-color: rgba(210, 239, 251, 1);
 }
 
+/* Shrunk down to just the call controls (button / mute / end-call) and
+   docked into the header — see .voice-call-dock above and the positioning
+   logic in app-voice.js. Everything else the widget renders by default
+   (avatar, agent name, tagline, timer, its own transcript, "powered by")
+   is hidden below; our own header/transcript stand in for it instead. */
 .webrtc_widget_outer_wrapper {
   position: absolute !important;
   z-index: 5 !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important;
+  justify-content: flex-end !important;
+  background: transparent !important;
 }
 
-.webrtc_widget_container {
-  max-width: 100% !important;
-  max-height: 100% !important;
+.webrtc_widget_content_stack,
+.webrtc_widget_container,
+.webrtc_widget_content_container {
+  background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
-  font-family: "Nunito Sans", Arial, Helvetica, sans-serif !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
 }
 
-.webrtc_widget_container,
-.webrtc_widget_container * {
-  font-family: "Nunito Sans", Arial, Helvetica, sans-serif !important;
+.webrtc_widget_content_container {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
 }
 
-/* Call state indicator on our own stage wrapper, independent of the
-   widget's internals — lets our own CSS react to call lifecycle if needed
-   without depending on the widget's private class names for that. */
-#voice-stage[data-call-state="active"] { box-shadow: inset 0 0 0 2px var(--lg-sky-2); }
+.webrtc_widget_content_logo,
+.webrtc_widget_agent_name,
+.webrtc_widget_tagline,
+.webrtc_widget_call_duration,
+.webrtc_widget_content_label,
+.webrtc_widget_powered_by,
+.webrtc_widget_connecting_message,
+.webrtc_widget_transcript_section,
+.webrtc_widget_transcript_wrapper,
+.webrtc_widget_audio_wave {
+  display: none !important;
+}
+
+/* The call button itself: a small L&G-branded circle instead of the
+   widget's default large pill. Reuses the same umbrella mark already
+   loaded in the page header, so there's no extra asset to depend on. */
+.webrtc_widget_call_button {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 0 !important;
+  border-radius: 50% !important;
+  background: #fff
+    url("https://www.legalandgeneral.com/asset/492094/globalassets/global-shared-assets/logos/landg_logo.svg")
+    center / 26px 26px no-repeat !important;
+  border: 1.5px solid var(--lg-border) !important;
+  box-shadow: 0 2px 8px rgba(0, 29, 110, .12) !important;
+}
+.webrtc_widget_call_button svg { display: none !important; }
+
+.webrtc_widget_call_controls_container {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: transparent !important;
+}
+
+.webrtc_widget_mute_button,
+.webrtc_widget_end_call_button {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 0 !important;
+  border-radius: 50% !important;
+}
+.webrtc_widget_end_call_button { background: #c0392b !important; }
+.webrtc_widget_mute_button { background: var(--lg-light) !important; border: 1px solid var(--lg-border) !important; }
 
 /* Mobile */
 @media (max-width: 1020px) {
@@ -397,7 +469,7 @@ a { color: inherit; }
   .conversation-shell { border-radius: 18px; min-height: 300px; }
   .assistant-heading { min-height: 64px; padding: 12px 16px; }
   .secure-note { display: none; }
-  #voice-stage { min-height: 240px; }
+  .voice-transcript { min-height: 240px; }
   .mini-footer { width: calc(100% - 24px); display: block; }
   .footer-links { margin-top: 10px; flex-wrap: wrap; }
 }

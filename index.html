@@ -54,17 +54,18 @@
             <span class="status"><span class="status-dot"></span> Virtual assistant &middot; voice</span>
             <h2>Ask L&G</h2>
           </div>
-          <span class="secure-note">Here to help 24/7</span>
+          <!-- The widget's own root is positioned over this small dock
+               (see app-voice.js) instead of over the whole panel — it's
+               restyled down to just the call button / mute / end-call
+               controls, same idea as a webchat header's call icon. -->
+          <div class="voice-call-dock" id="voice-call-dock" aria-label="Call controls"></div>
         </div>
 
-        <div id="voice-stage" data-call-state="idle">
-          <div id="voice-loading">
-            <div class="loading-mark">L&G</div>
-            <div>
-              <strong>Connecting voice assistant…</strong>
-              <span>The call button will appear here.</span>
-            </div>
-          </div>
+        <!-- Our own transcript, rendered from session.on('transcription')
+             events, styled to match the chat version's message bubbles so
+             the conversation feels the same regardless of channel. -->
+        <div class="voice-transcript" id="voice-transcript">
+          <p class="voice-transcript__empty" id="voice-transcript-empty">Press the call button to start talking with Ella.</p>
         </div>
       </section>
 
