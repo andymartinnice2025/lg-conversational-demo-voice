@@ -1,6 +1,6 @@
 # L&G "Ask L&G" Voice Demo — Run Script
 
-Live URL: (added after first deploy — see README)
+Live URL: https://andymartinnice2025.github.io/lg-conversational-demo-voice/
 Agent: Ella (Cognigy.AI project "LegalandGeneral", flow "Ella - L&G Contact Us Assistant Flow Voice")
 Endpoint: voiceGateway2, token `5809e50875e7a7b0b348cc32815da1f55af3f3e0cfa283c5fe62a82cc8dad47f`
 
