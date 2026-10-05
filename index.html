@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How can we help? | L&G Voice</title>
+  <meta name="description" content="Prototype voice contact experience for Legal & General." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#" aria-label="Legal & General home">
+        <img src="https://www.legalandgeneral.com/asset/492094/globalassets/global-shared-assets/logos/landg_logo.svg"
+             alt="Legal & General" />
+      </a>
+
+      <nav class="primary-nav" aria-label="Primary navigation">
+        <a href="#">Insurance</a>
+        <a href="#">ISAs</a>
+        <a href="#">Pension savings</a>
+        <a href="#">Retirement</a>
+        <a href="#">Later life mortgages</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-link" type="button" aria-label="Search">
+          <span class="search-icon" aria-hidden="true"></span><span>Search</span>
+        </button>
+        <a class="login-link" href="#">Log in</a>
+        <a class="register-button" href="#">Register</a>
+      </div>
+
+      <button class="mobile-menu" type="button" aria-label="Open menu">Menu</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="intro" aria-labelledby="page-title">
+      <div class="eyebrow">L&G help and support &middot; voice</div>
+      <h1 id="page-title">How can we help?</h1>
+      <p>Start a call and tell us what you need in your own words. We'll talk you through it, show you your options as we go, and help you take the next step.</p>
+    </section>
+
+    <!-- Contextual Workspace: persistent right-hand panel, driven by
+         structured `ui` data from the voice conversation (see workspace.js).
+         Same contract as the chat version, just delivered over
+         session.sendInfo()/on('newInfo') instead of webchat.sendMessage()/
+         onMessage() — see app-voice.js. -->
+    <div class="workspace-layout" id="workspace-layout">
+      <section class="conversation-shell" aria-label="L&G voice assistant">
+        <div class="assistant-heading">
+          <div>
+            <span class="status"><span class="status-dot"></span> Virtual assistant &middot; voice</span>
+            <h2>Ask L&G</h2>
+          </div>
+          <span class="secure-note">Here to help 24/7</span>
+        </div>
+
+        <div id="voice-stage" data-call-state="idle">
+          <div id="voice-loading">
+            <div class="loading-mark">L&G</div>
+            <div>
+              <strong>Connecting voice assistant…</strong>
+              <span>The call button will appear here.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="context-workspace" id="context-workspace" aria-label="Contextual workspace">
+        <div class="context-workspace__body" id="workspace-body">
+          <!-- populated by workspace.js as ui instructions arrive -->
+        </div>
+      </aside>
+    </div>
+
+    <p class="ai-note">Our virtual assistant uses AI and may make mistakes. Please check important information before making financial decisions.</p>
+  </main>
+
+  <footer class="mini-footer">
+    <div>Legal & General</div>
+    <div class="footer-links">
+      <a href="#">Accessibility</a><a href="#">Privacy</a><a href="#">Security</a><a href="#">Contact us</a>
+    </div>
+  </footer>
+
+  <script src="https://github.com/Cognigy/click-to-call-widget/releases/latest/download/webRTCWidget.js"></script>
+  <script src="workspace.js"></script>
+  <script src="app-voice.js"></script>
+</body>
+</html>
